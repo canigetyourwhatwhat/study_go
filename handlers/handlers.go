@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/gorilla/mux"
 	"io"
@@ -56,37 +55,14 @@ func ListArticles(w http.ResponseWriter, r *http.Request) {
 }
 
 func PostArticle(w http.ResponseWriter, r *http.Request) {
+	var article models.Article
+	if err := json.NewDecoder(r.Body).Decode(&article); err != nil {
+		http.Error(w, "Failed to decode", http.StatusBadRequest)
+	}
+	log.Println(article)
 
-	// ------ Read the Body in Request Header   -----
-	// Get Content-Length to make a slice
-	length, err := strconv.Atoi(r.Header.Get("Content-Length"))
-	if err != nil {
-		http.Error(w, "Invalid value in Content-Length", http.StatusBadRequest)
-		return
+	if err := json.NewEncoder(w).Encode(article); err != nil {
+		http.Error(w, "Failed to decode", http.StatusBadRequest)
 	}
-	reqBodyBuffer := make([]byte, length)
-	// Read the Body info and store in byte slice
-	if _, err = r.Body.Read(reqBodyBuffer); !errors.Is(err, io.EOF) {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
-		return
-	}
-	defer r.Body.Close()
-	log.Println("Retrieved body: ", reqBodyBuffer)
 
-	// ------ Unmarshal the data  -----
-	var reqArticle models.Article
-	if err = json.Unmarshal(reqBodyBuffer, &reqArticle); err != nil {
-		http.Error(w, "Failed to unmarshal", http.StatusBadRequest)
-		return
-	}
-	log.Println("Unmarshalled / decoded body: ", reqArticle)
-
-	// ------ Marshal the data and return it  -----
-	jsonData, err := json.Marshal(reqArticle)
-	if err != nil {
-		http.Error(w, "Invalid json format", http.StatusInternalServerError)
-		return
-	}
-	w.Write(jsonData)
-	log.Println("Marshalled / encoded body: ", reqArticle)
 }

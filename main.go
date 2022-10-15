@@ -6,14 +6,10 @@ import (
 	"log"
 	"net/http"
 	"practice_go/handlers"
-	"strings"
 )
 
 func main() {
 	r := mux.NewRouter()
-
-	str := "hello world"
-	println(strings.HasPrefix(str, "ll"))
 
 	r.HandleFunc("/hello", handlers.HelloHandler).Methods(http.MethodGet)
 	r.HandleFunc("/article/{category}/{id}", handlers.GetOneArticle).Methods(http.MethodGet)
