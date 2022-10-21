@@ -7,7 +7,9 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"practice_go/database"
 	"practice_go/models"
+	"practice_go/repository"
 	"strconv"
 )
 
@@ -19,18 +21,24 @@ func HelloHandler(w http.ResponseWriter, _ *http.Request) {
 	}
 }
 
-func GetOneArticle(w http.ResponseWriter, r *http.Request) {
+func GetArticle(w http.ResponseWriter, r *http.Request) {
 	articleID, err := strconv.Atoi(mux.Vars(r)["id"])
-	categoryName := mux.Vars(r)["category"]
-	if err != nil || categoryName == "" {
+	if err != nil {
 		http.Error(w, "invalid article ID", http.StatusBadRequest)
 		return
 	}
-	resStr := fmt.Sprintf("This articel is category of %s and number is %d", categoryName, articleID)
-	if _, err = io.WriteString(w, resStr); err != nil {
-		http.Error(w, "Can't write", http.StatusInternalServerError)
+
+	var article *models.Article
+	article, err = repository.GetArticleByArticleID(database.DB, articleID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	if err := json.NewEncoder(w).Encode(article); err != nil {
+		http.Error(w, "Failed to decode", http.StatusBadRequest)
+	}
+
 }
 
 func ListArticles(w http.ResponseWriter, r *http.Request) {
@@ -56,13 +64,15 @@ func ListArticles(w http.ResponseWriter, r *http.Request) {
 
 func PostArticle(w http.ResponseWriter, r *http.Request) {
 	var article models.Article
-	if err := json.NewDecoder(r.Body).Decode(&article); err != nil {
+
+	err := json.NewDecoder(r.Body).Decode(&article)
+	if err != nil {
 		http.Error(w, "Failed to decode", http.StatusBadRequest)
 	}
-	log.Println(article)
+	log.Println("inserted article: ", article)
 
-	if err := json.NewEncoder(w).Encode(article); err != nil {
-		http.Error(w, "Failed to decode", http.StatusBadRequest)
+	_, err = repository.InsertArticle(database.DB, &article)
+	if err != nil {
+		http.Error(w, "Failed to post article", http.StatusInternalServerError)
 	}
-
 }

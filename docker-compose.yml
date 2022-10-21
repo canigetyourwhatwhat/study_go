@@ -22,7 +22,7 @@ services:
       - "3306:3306"
 
     volumes:
-      - db-volume:/var/lub/mysql
+      - "./database/:/docker-entrypoint-initdb.d/"
 
 volumes:
   db-volume:
