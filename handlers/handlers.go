@@ -91,3 +91,17 @@ func PostNice(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to add nice on the article", http.StatusInternalServerError)
 	}
 }
+
+func PostComment(w http.ResponseWriter, r *http.Request) {
+	var comment models.Comment
+
+	err := json.NewDecoder(r.Body).Decode(&comment)
+	if err != nil {
+		http.Error(w, "Failed to decode", http.StatusBadRequest)
+	}
+
+	err = repository.InsertComment(database.DB, &comment)
+	if err != nil {
+		http.Error(w, "Failed to post comment", http.StatusInternalServerError)
+	}
+}

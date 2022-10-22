@@ -16,6 +16,7 @@ func InsertArticle(db *sqlx.DB, article *models.Article) error {
 
 	_, err = tx.Exec("insert into articles (title, contents, username) values (?, ?, ?)", article.Title, article.Contents, article.UserName)
 	if err != nil {
+		tx.Rollback()
 		return err
 	}
 
@@ -62,9 +63,10 @@ func AddNiceByArticle(db *sqlx.DB, articleId int) error {
 	var targetNiceNum int
 	err = db.Get(&targetNiceNum, `select nice_num from articles where id = ?`, &articleId)
 	if errors.Is(err, sql.ErrNoRows) {
+		tx.Rollback()
 		return errors.New("no article for that ID")
-	}
-	if err != nil {
+	} else if err != nil {
+		tx.Rollback()
 		return err
 	}
 
@@ -76,6 +78,7 @@ func AddNiceByArticle(db *sqlx.DB, articleId int) error {
 
 	// Always good to use tx since I can roll back wherever I got an error.
 	if err = tx.Commit(); err != nil {
+		tx.Rollback()
 		return err
 	}
 

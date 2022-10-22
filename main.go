@@ -33,7 +33,7 @@ func main() {
 	r.HandleFunc("/article/nice", handlers.PostNice).Methods(http.MethodPost)
 
 	// Add comment to the specific article
-	//r.HandleFunc("article/nice", handlers.PostComment).Methods(http.MethodPost)
+	r.HandleFunc("/article/comment", handlers.PostComment).Methods(http.MethodPost)
 
 	http.HandleFunc("/", func(writer http.ResponseWriter, request *http.Request) {
 		io.WriteString(writer, "this is default router")

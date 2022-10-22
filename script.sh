@@ -13,3 +13,5 @@ curl http://localhost:8080/article/2
 curl http://localhost:8080/article/nice -X POST -d '{"articleId": 1}'
 
 curl http://localhost:8080/article/all
+
+curl http://localhost:8080/article/comment -X POST -d '{"articleId":2,"message":"it is great"}'
