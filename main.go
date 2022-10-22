@@ -27,10 +27,10 @@ func main() {
 	r.HandleFunc("/article/{id:[0-9]+}", handlers.GetArticle).Methods(http.MethodGet)
 
 	// List all articles
-	r.HandleFunc("/article/list", handlers.ListArticles).Methods(http.MethodGet)
+	r.HandleFunc("/article/all", handlers.ListArticles).Methods(http.MethodGet)
 
 	// Add nice to the specific article
-	//r.HandleFunc("article/nice", handlers.PostNice).Methods(http.MethodPost)
+	r.HandleFunc("/article/nice", handlers.PostNice).Methods(http.MethodPost)
 
 	// Add comment to the specific article
 	//r.HandleFunc("article/nice", handlers.PostComment).Methods(http.MethodPost)

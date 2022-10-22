@@ -66,10 +66,28 @@ func PostArticle(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, "Failed to decode", http.StatusBadRequest)
 	}
-	log.Println("inserted article: ", article)
 
-	_, err = repository.InsertArticle(database.DB, &article)
+	err = repository.InsertArticle(database.DB, &article)
 	if err != nil {
 		http.Error(w, "Failed to post article", http.StatusInternalServerError)
+	}
+}
+
+func PostNice(w http.ResponseWriter, r *http.Request) {
+
+	type Req struct {
+		ArticleId int `json:"articleId"`
+	}
+
+	var req Req
+
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		http.Error(w, "Failed to decode", http.StatusBadRequest)
+	}
+
+	err = repository.AddNiceByArticle(database.DB, req.ArticleId)
+	if err != nil {
+		http.Error(w, "Failed to add nice on the article", http.StatusInternalServerError)
 	}
 }
