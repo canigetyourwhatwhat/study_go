@@ -16,7 +16,7 @@ type Article struct {
 
 type Comment struct {
 	CommentID int       `json:"commentID"`
-	ArticleID int       `json:"articleID"`
+	ArticleID int       `json:"articleID" db:"article_id"`
 	Message   string    `json:"message"`
 	CreatedAt time.Time `json:"createdAt" db:"created_at"`
 }
