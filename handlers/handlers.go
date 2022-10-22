@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/gorilla/mux"
 	"io"
 	"log"
@@ -36,30 +35,28 @@ func GetArticle(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := json.NewEncoder(w).Encode(article); err != nil {
-		http.Error(w, "Failed to decode", http.StatusBadRequest)
+		log.Println(err.Error())
+		http.Error(w, "Failed to show on the screen", http.StatusInternalServerError)
 	}
 
 }
 
 func ListArticles(w http.ResponseWriter, r *http.Request) {
-	queryParam := r.URL.Query()
-	var page int
+	var articles []*models.Article
+	var err error
 
-	if query, ok := queryParam["page"]; ok == true && len(query) > 0 {
-		num, err := strconv.Atoi(query[0])
-		if err != nil {
-			http.Error(w, "Invalid input for page", http.StatusBadRequest)
-			return
-		}
-		page = num
-	} else {
-		page = 1
+	articles, err = repository.ListArticles(database.DB)
+	if err != nil {
+		log.Println(err.Error())
+		http.Error(w, "Failed to list all articles", http.StatusInternalServerError)
 	}
-	resStr := fmt.Sprintf("This is page %d", page)
-	if _, err := io.WriteString(w, resStr); err != nil {
-		http.Error(w, "Can't write", http.StatusInternalServerError)
-		return
+
+	err = json.NewEncoder(w).Encode(articles)
+	if err != nil {
+		log.Println(err.Error())
+		http.Error(w, "Failed to show on the screen", http.StatusInternalServerError)
 	}
+
 }
 
 func PostArticle(w http.ResponseWriter, r *http.Request) {

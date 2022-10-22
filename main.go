@@ -11,8 +11,11 @@ import (
 )
 
 func main() {
+	var err error
 	r := mux.NewRouter()
-	database.ConnectDB()
+	if err = database.ConnectDB(); err != nil {
+		panic(err)
+	}
 
 	// simply return hello
 	r.HandleFunc("/hello", handlers.HelloHandler).Methods(http.MethodGet)
@@ -26,10 +29,10 @@ func main() {
 	// List all articles
 	r.HandleFunc("/article/list", handlers.ListArticles).Methods(http.MethodGet)
 
-	//// Add nice to the specific article
+	// Add nice to the specific article
 	//r.HandleFunc("article/nice", handlers.PostNice).Methods(http.MethodPost)
-	//
-	//// Add nice to the specific article
+
+	// Add comment to the specific article
 	//r.HandleFunc("article/nice", handlers.PostComment).Methods(http.MethodPost)
 
 	http.HandleFunc("/", func(writer http.ResponseWriter, request *http.Request) {

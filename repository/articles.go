@@ -5,11 +5,11 @@ import (
 	"errors"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
-	"log"
+	"github.com/jmoiron/sqlx"
 	"practice_go/models"
 )
 
-func InsertArticle(db *sql.DB, article *models.Article) (int, error) {
+func InsertArticle(db *sqlx.DB, article *models.Article) (int, error) {
 	result, err := db.Exec("insert into articles (title, contents, username) values (?, ?, ?)", article.Title, article.Contents, article.UserName)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -20,21 +20,29 @@ func InsertArticle(db *sql.DB, article *models.Article) (int, error) {
 	return int(id), err
 }
 
-func GetArticleByArticleID(db *sql.DB, articleID int) (*models.Article, error) {
+func GetArticleByArticleID(db *sqlx.DB, articleID int) (*models.Article, error) {
 	var article models.Article
-	row := db.QueryRow(`select * from articles where id = ?`, &articleID)
-	if errors.Is(row.Err(), sql.ErrNoRows) {
+	err := db.Get(&article, `select * from articles where id = ?`, &articleID)
+	if errors.Is(err, sql.ErrNoRows) {
 		return nil, errors.New("no article for that ID")
 	}
-	if row.Err() != nil {
-		return nil, row.Err()
-	}
-
-	if err := row.Scan(&article.ID, &article.Title, &article.Contents, &article.UserName, &article.NiceNum, &article.CreatedAt, &article.UpdatedAt); err != nil {
-		fmt.Println("here")
-		log.Println(err.Error())
+	if err != nil {
+		return nil, err
 	}
 
 	return &article, nil
 
+}
+
+func ListArticles(db *sqlx.DB) ([]*models.Article, error) {
+	var articles []*models.Article
+	err := db.Select(&articles, `select * from articles`)
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, errors.New("no article for that ID")
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	return articles, nil
 }

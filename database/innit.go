@@ -1,12 +1,13 @@
 package database
 
 import (
-	"database/sql"
 	"fmt"
+	"github.com/go-sql-driver/mysql"
+	"github.com/jmoiron/sqlx"
 	"log"
 )
 
-var DB *sql.DB
+var DB *sqlx.DB
 
 func ConnectDB() error {
 
@@ -18,21 +19,20 @@ func ConnectDB() error {
 	dbName := "sampledb"
 
 	// bad example
-	connectDbStr := fmt.Sprintf("%s:%s@tcp(127.0.0.1:3306)/%s?parseTime=true", dbUser, dbPass, dbName)
-	db, err := sql.Open("mysql", connectDbStr)
+	//connectDbStr := fmt.Sprintf("%s:%s@tcp(127.0.0.1:3306)/%s?parseTime=true", dbUser, dbPass, dbName)
+	//db, err := sqlx.Open("mysql", connectDbStr)
 
 	// good example
-	//connectDbStr := mysql.Config{
-	//	DBName:    dbName,
-	//	User:      dbUser,
-	//	Passwd:    dbPass,
-	//	Addr:      "localhost:3306",
-	//	Net:       "tcp",
-	//	ParseTime: true,
-	//}
-	//db, err := sql.Open("mysql", connectDbStr.FormatDSN())
-
-	//defer db.Close()
+	connectDbStr := mysql.Config{
+		DBName:               dbName,
+		User:                 dbUser,
+		Passwd:               dbPass,
+		Addr:                 "127.0.0.1:3306",
+		Net:                  "tcp",
+		ParseTime:            true,
+		AllowNativePasswords: true,
+	}
+	db, err := sqlx.Open("mysql", connectDbStr.FormatDSN())
 
 	if err != nil {
 		fmt.Println("Couldn't connect the Database")
