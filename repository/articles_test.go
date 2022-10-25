@@ -52,7 +52,6 @@ func TestAddNiceByArticle(t *testing.T) {
 		if _, err := database.DB.Exec("update articles set nice_num = ? where id = ?", initialNiceNum, targetArticleId); err != nil {
 			t.Errorf(err.Error())
 		}
-
 	})
 
 }
@@ -91,6 +90,10 @@ func TestGetArticleByArticleID(t *testing.T) {
 }
 
 func TestInsertArticle(t *testing.T) {
+
+	actualArticle := database.ArticleTestData[2]
+	var expectedArticle models.Article
+
 	type args struct {
 		db      *sqlx.DB
 		article *models.Article
@@ -100,18 +103,40 @@ func TestInsertArticle(t *testing.T) {
 		args    args
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{"1", args{db: database.DB, article: &actualArticle}, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if err := InsertArticle(tt.args.db, tt.args.article); (err != nil) != tt.wantErr {
 				t.Errorf("InsertArticle() error = %v, wantErr %v", err, tt.wantErr)
 			}
+
+			if err := database.DB.Get(&expectedArticle, "select * from articles where id = ?", actualArticle.ID); err != nil {
+				t.Errorf(err.Error())
+			}
+
+			// Solve the time stamp issue
+			expectedArticle.UpdatedAt = actualArticle.UpdatedAt
+			expectedArticle.CreatedAt = actualArticle.CreatedAt
+
+			if !reflect.DeepEqual(expectedArticle, actualArticle) {
+				t.Errorf("GetArticleByArticleID() got = %v, want %v", actualArticle, expectedArticle)
+			}
+
 		})
 	}
+
+	t.Cleanup(func() {
+		if _, err := database.DB.Exec("delete from articles where id = ?", actualArticle.ID); err != nil {
+			t.Errorf(err.Error())
+		}
+	})
 }
 
 func TestListArticles(t *testing.T) {
+
+	articles := []*models.Article{&database.ArticleTestData[0], &database.ArticleTestData[1]}
+
 	type args struct {
 		db *sqlx.DB
 	}
@@ -121,15 +146,23 @@ func TestListArticles(t *testing.T) {
 		want    []*models.Article
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{"1", args{database.DB}, articles, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := ListArticles(tt.args.db)
+
+			// resolve time issues
+			for i := range tt.want {
+				got[i].CreatedAt = tt.want[i].CreatedAt
+				got[i].UpdatedAt = tt.want[i].UpdatedAt
+			}
+
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ListArticles() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
+
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("ListArticles() got = %v, want %v", got, tt.want)
 			}

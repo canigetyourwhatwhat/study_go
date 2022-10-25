@@ -26,4 +26,13 @@ var ArticleTestData = []models.Article{
 		CreatedAt: tempTime,
 		UpdatedAt: tempTime,
 	},
+	{
+		ID:        3,
+		Title:     "For Insertion",
+		Contents:  "Third blog post",
+		UserName:  "david",
+		NiceNum:   3,
+		CreatedAt: tempTime,
+		UpdatedAt: tempTime,
+	},
 }

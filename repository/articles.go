@@ -14,14 +14,18 @@ func InsertArticle(db *sqlx.DB, article *models.Article) error {
 		return err
 	}
 
-	_, err = tx.Exec("insert into articles (title, contents, username) values (?, ?, ?)", article.Title, article.Contents, article.UserName)
+	_, err = tx.Exec("insert into articles (title, contents, username, nice_num) values (?, ?, ?, ?)", article.Title, article.Contents, article.UserName, article.NiceNum)
 	if err != nil {
-		tx.Rollback()
+		if err = tx.Rollback(); err != nil {
+			return err
+		}
 		return err
 	}
 
 	if err = tx.Commit(); err != nil {
-		tx.Rollback()
+		if err = tx.Rollback(); err != nil {
+			return err
+		}
 		return err
 	}
 
@@ -63,22 +67,30 @@ func AddNiceByArticle(db *sqlx.DB, articleId int) error {
 	var targetNiceNum int
 	err = db.Get(&targetNiceNum, `select nice_num from articles where id = ?`, &articleId)
 	if errors.Is(err, sql.ErrNoRows) {
-		tx.Rollback()
+		if err = tx.Rollback(); err != nil {
+			return err
+		}
 		return errors.New("no article for that ID")
 	} else if err != nil {
-		tx.Rollback()
+		if err = tx.Rollback(); err != nil {
+			return err
+		}
 		return err
 	}
 
 	_, err = tx.Exec(`update articles set nice_num = ? where id = ?`, targetNiceNum+1, articleId)
 	if err != nil {
-		tx.Rollback()
+		if err = tx.Rollback(); err != nil {
+			return err
+		}
 		return err
 	}
 
 	// Always good to use tx since I can roll back wherever I got an error.
 	if err = tx.Commit(); err != nil {
-		tx.Rollback()
+		if err = tx.Rollback(); err != nil {
+			return err
+		}
 		return err
 	}
 
