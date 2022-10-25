@@ -5,6 +5,7 @@ import (
 	"github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 	"log"
+	"os"
 )
 
 var DB *sqlx.DB
@@ -14,9 +15,11 @@ func ConnectDB() error {
 	if DB != nil {
 		return nil
 	}
-	dbUser := "docker"
-	dbPass := "docker"
-	dbName := "sampledb"
+	dbUser := os.Getenv("DB_USER")
+	dbPass := os.Getenv("DB_PASSWORD")
+	dbName := os.Getenv("DB_NAME")
+
+	fmt.Println(dbUser)
 
 	// bad example
 	//connectDbStr := fmt.Sprintf("%s:%s@tcp(127.0.0.1:3306)/%s?parseTime=true", dbUser, dbPass, dbName)

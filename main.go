@@ -3,6 +3,7 @@ package main
 import (
 	_ "github.com/go-sql-driver/mysql" // It is the key to connect DB, but don't use it explicitly.
 	"github.com/gorilla/mux"
+	"github.com/joho/godotenv"
 	"io"
 	"log"
 	"net/http"
@@ -11,8 +12,14 @@ import (
 )
 
 func main() {
-	var err error
 	r := mux.NewRouter()
+
+	var err error
+
+	if err := godotenv.Load(".env"); err != nil {
+		log.Println(err.Error())
+	}
+
 	if err = database.ConnectDB(); err != nil {
 		log.Println(err.Error())
 	}
