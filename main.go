@@ -14,9 +14,8 @@ func main() {
 	var err error
 	r := mux.NewRouter()
 	if err = database.ConnectDB(); err != nil {
-		panic(err)
+		log.Println(err.Error())
 	}
-
 	// simply return hello
 	r.HandleFunc("/hello", handlers.HelloHandler).Methods(http.MethodGet)
 
@@ -36,7 +35,7 @@ func main() {
 	r.HandleFunc("/article/comment", handlers.PostComment).Methods(http.MethodPost)
 
 	http.HandleFunc("/", func(writer http.ResponseWriter, request *http.Request) {
-		io.WriteString(writer, "this is default router")
+		_, _ = io.WriteString(writer, "this is default router")
 	})
 
 	log.Println("server started")

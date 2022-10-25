@@ -22,13 +22,14 @@ create table if not exists comments (
 
 -- 記事データ2つ
 insert into articles
-(title, contents, username, nice_num, created_at) values
-    ('firstPost', 'This is my first blog', 'saki', 2, now());
+(title, contents, username, nice_num, created_at, updated_at) values
+    ('firstPost', 'This is my first blog', 'john', 2, '2000-01-01 00:00:00', '2000-01-01 00:00:00');
 
 insert into articles
-(title, contents, username, nice_num) values
-    ('2nd', 'Second blog post', 'saki', 4);
+(title, contents, username, nice_num, created_at, updated_at) values
+    ('2nd', 'Second blog post', 'bob', 4, '2000-01-01 00:00:00', '2000-01-01 00:00:00');
 
+# update articles set updated_at = '2000-01-01 00:00:00';
 
 -- コメントデータ 2 つ
 insert into comments
