@@ -7,9 +7,17 @@ import (
 	"log"
 	"net/http"
 	"practice_go/entity"
-	"practice_go/usecase"
+	"practice_go/service"
 	"strconv"
 )
+
+type MyAppController struct {
+	service *service.MyAppService
+}
+
+func NewMyAppController(s *service.MyAppService) *MyAppController {
+	return &MyAppController{service: s}
+}
 
 func HelloHandler(w http.ResponseWriter, _ *http.Request) {
 	log.Println("hello handler")
@@ -19,7 +27,7 @@ func HelloHandler(w http.ResponseWriter, _ *http.Request) {
 	}
 }
 
-func GetArticle(w http.ResponseWriter, r *http.Request) {
+func (c *MyAppController) GetArticle(w http.ResponseWriter, r *http.Request) {
 
 	// Get the ID of the article
 	articleID, err := strconv.Atoi(mux.Vars(r)["id"])
@@ -29,7 +37,7 @@ func GetArticle(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Pass variable to business logic
-	result, err := usecase.GetArticle(articleID)
+	result, err := c.service.GetArticle(articleID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -43,10 +51,10 @@ func GetArticle(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func ListArticles(w http.ResponseWriter, _ *http.Request) {
+func (c *MyAppController) ListArticles(w http.ResponseWriter, _ *http.Request) {
 
 	// Call business logic without parameter
-	articles, err := usecase.ListArticle()
+	articles, err := c.service.ListArticles()
 	if err != nil {
 		log.Println(err.Error())
 		http.Error(w, "Failed to list all articles", http.StatusInternalServerError)
@@ -61,7 +69,7 @@ func ListArticles(w http.ResponseWriter, _ *http.Request) {
 
 }
 
-func PostArticle(w http.ResponseWriter, r *http.Request) {
+func (c *MyAppController) PostArticle(w http.ResponseWriter, r *http.Request) {
 	var article entity.Article
 
 	err := json.NewDecoder(r.Body).Decode(&article)
@@ -69,13 +77,13 @@ func PostArticle(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to decode", http.StatusBadRequest)
 	}
 
-	err = usecase.InsertArticle(&article)
+	err = c.service.InsertArticle(&article)
 	if err != nil {
 		http.Error(w, "Failed to post article", http.StatusInternalServerError)
 	}
 }
 
-func PostNice(w http.ResponseWriter, r *http.Request) {
+func (c *MyAppController) PostNice(w http.ResponseWriter, r *http.Request) {
 
 	// Get the article ID by decoding
 	type Req struct {
@@ -87,13 +95,13 @@ func PostNice(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to decode", http.StatusBadRequest)
 	}
 
-	err = usecase.PostNice(req.ArticleId)
+	err = c.service.PostNice(req.ArticleId)
 	if err != nil {
 		http.Error(w, "Failed to add nice on the article", http.StatusInternalServerError)
 	}
 }
 
-func PostComment(w http.ResponseWriter, r *http.Request) {
+func (c *MyAppController) PostComment(w http.ResponseWriter, r *http.Request) {
 	var comment entity.Comment
 
 	err := json.NewDecoder(r.Body).Decode(&comment)
@@ -101,7 +109,7 @@ func PostComment(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to decode", http.StatusBadRequest)
 	}
 
-	err = usecase.PostComment(&comment)
+	err = c.service.PostComment(&comment)
 	if err != nil {
 		http.Error(w, "Failed to post comment", http.StatusInternalServerError)
 	}
