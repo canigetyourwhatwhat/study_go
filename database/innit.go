@@ -15,17 +15,10 @@ func ConnectDB() error {
 	if DB != nil {
 		return nil
 	}
-	dbUser := os.Getenv("DB_USER")
-	dbPass := os.Getenv("DB_PASSWORD")
+	dbUser := os.Getenv("USER_NAME")
+	dbPass := os.Getenv("USER_PASSWORD")
 	dbName := os.Getenv("DB_NAME")
 
-	fmt.Println(dbUser)
-
-	// bad example
-	//connectDbStr := fmt.Sprintf("%s:%s@tcp(127.0.0.1:3306)/%s?parseTime=true", dbUser, dbPass, dbName)
-	//db, err := sqlx.Open("mysql", connectDbStr)
-
-	// good example
 	connectDbStr := mysql.Config{
 		DBName:               dbName,
 		User:                 dbUser,

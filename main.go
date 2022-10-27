@@ -7,8 +7,8 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"practice_go/controllers"
 	"practice_go/database"
-	"practice_go/handlers"
 )
 
 func main() {
@@ -24,22 +24,22 @@ func main() {
 		log.Println(err.Error())
 	}
 	// simply return hello
-	r.HandleFunc("/hello", handlers.HelloHandler).Methods(http.MethodGet)
+	r.HandleFunc("/hello", controllers.HelloHandler).Methods(http.MethodGet)
 
 	// Post an article
-	r.HandleFunc("/article", handlers.PostArticle).Methods(http.MethodPost)
+	r.HandleFunc("/article", controllers.PostArticle).Methods(http.MethodPost)
 
 	// Get specific article based on the article_id
-	r.HandleFunc("/article/{id:[0-9]+}", handlers.GetArticle).Methods(http.MethodGet)
+	r.HandleFunc("/article/{id:[0-9]+}", controllers.GetArticle).Methods(http.MethodGet)
 
 	// List all articles
-	r.HandleFunc("/article/all", handlers.ListArticles).Methods(http.MethodGet)
+	r.HandleFunc("/article/all", controllers.ListArticles).Methods(http.MethodGet)
 
 	// Add nice to the specific article
-	r.HandleFunc("/article/nice", handlers.PostNice).Methods(http.MethodPost)
+	r.HandleFunc("/article/nice", controllers.PostNice).Methods(http.MethodPost)
 
 	// Add comment to the specific article
-	r.HandleFunc("/article/comment", handlers.PostComment).Methods(http.MethodPost)
+	r.HandleFunc("/article/comment", controllers.PostComment).Methods(http.MethodPost)
 
 	http.HandleFunc("/", func(writer http.ResponseWriter, request *http.Request) {
 		_, _ = io.WriteString(writer, "this is default router")

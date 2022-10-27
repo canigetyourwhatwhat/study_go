@@ -3,10 +3,10 @@ package repository
 import (
 	"fmt"
 	"github.com/jmoiron/sqlx"
-	"practice_go/models"
+	"practice_go/entity"
 )
 
-func InsertComment(db *sqlx.DB, comment *models.Comment) error {
+func InsertComment(db *sqlx.DB, comment *entity.Comment) error {
 	tx, err := db.Begin()
 	if err != nil {
 		return err

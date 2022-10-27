@@ -2,14 +2,14 @@ package repository
 
 import (
 	"github.com/jmoiron/sqlx"
-	"practice_go/models"
+	"practice_go/entity"
 	"testing"
 )
 
 func TestInsertComment(t *testing.T) {
 	type args struct {
 		db      *sqlx.DB
-		comment *models.Comment
+		comment *entity.Comment
 	}
 	tests := []struct {
 		name    string

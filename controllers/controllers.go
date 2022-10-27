@@ -1,4 +1,4 @@
-package handlers
+package controllers
 
 import (
 	"encoding/json"
@@ -6,9 +6,8 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"practice_go/database"
-	"practice_go/models"
-	"practice_go/repository"
+	"practice_go/entity"
+	"practice_go/usecase"
 	"strconv"
 )
 
@@ -21,36 +20,39 @@ func HelloHandler(w http.ResponseWriter, _ *http.Request) {
 }
 
 func GetArticle(w http.ResponseWriter, r *http.Request) {
+
+	// Get the ID of the article
 	articleID, err := strconv.Atoi(mux.Vars(r)["id"])
 	if err != nil {
 		http.Error(w, "invalid article ID", http.StatusBadRequest)
 		return
 	}
 
-	var article *models.Article
-	article, err = repository.GetArticleByArticleID(database.DB, articleID)
+	// Pass variable to business logic
+	result, err := usecase.GetArticle(articleID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	if err := json.NewEncoder(w).Encode(article); err != nil {
+	// Return the result by encoding
+	if err := json.NewEncoder(w).Encode(result); err != nil {
 		log.Println(err.Error())
 		http.Error(w, "Failed to show on the screen", http.StatusInternalServerError)
 	}
 
 }
 
-func ListArticles(w http.ResponseWriter, r *http.Request) {
-	var articles []*models.Article
-	var err error
+func ListArticles(w http.ResponseWriter, _ *http.Request) {
 
-	articles, err = repository.ListArticles(database.DB)
+	// Call business logic without parameter
+	articles, err := usecase.ListArticle()
 	if err != nil {
 		log.Println(err.Error())
 		http.Error(w, "Failed to list all articles", http.StatusInternalServerError)
 	}
 
+	// Return the result by encoding
 	err = json.NewEncoder(w).Encode(articles)
 	if err != nil {
 		log.Println(err.Error())
@@ -60,14 +62,14 @@ func ListArticles(w http.ResponseWriter, r *http.Request) {
 }
 
 func PostArticle(w http.ResponseWriter, r *http.Request) {
-	var article models.Article
+	var article entity.Article
 
 	err := json.NewDecoder(r.Body).Decode(&article)
 	if err != nil {
 		http.Error(w, "Failed to decode", http.StatusBadRequest)
 	}
 
-	err = repository.InsertArticle(database.DB, &article)
+	err = usecase.InsertArticle(&article)
 	if err != nil {
 		http.Error(w, "Failed to post article", http.StatusInternalServerError)
 	}
@@ -75,32 +77,31 @@ func PostArticle(w http.ResponseWriter, r *http.Request) {
 
 func PostNice(w http.ResponseWriter, r *http.Request) {
 
+	// Get the article ID by decoding
 	type Req struct {
 		ArticleId int `json:"articleId"`
 	}
-
 	var req Req
-
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
 		http.Error(w, "Failed to decode", http.StatusBadRequest)
 	}
 
-	err = repository.AddNiceByArticle(database.DB, req.ArticleId)
+	err = usecase.PostNice(req.ArticleId)
 	if err != nil {
 		http.Error(w, "Failed to add nice on the article", http.StatusInternalServerError)
 	}
 }
 
 func PostComment(w http.ResponseWriter, r *http.Request) {
-	var comment models.Comment
+	var comment entity.Comment
 
 	err := json.NewDecoder(r.Body).Decode(&comment)
 	if err != nil {
 		http.Error(w, "Failed to decode", http.StatusBadRequest)
 	}
 
-	err = repository.InsertComment(database.DB, &comment)
+	err = usecase.PostComment(&comment)
 	if err != nil {
 		http.Error(w, "Failed to post comment", http.StatusInternalServerError)
 	}

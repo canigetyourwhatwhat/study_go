@@ -13,9 +13,9 @@ services:
     environment:
       MYSQL_ROOT_USER: ${ROOT_USER}
       MYSQL_ROOT_PASSWORD: ${ROOT_PASS}
-      MYSQL_DATABASE: ${DATABASE}
+      MYSQL_DATABASE: ${DB_NAME}
       MYSQL_USER: ${USER_NAME}
-      MYSQL_PASSWORD: ${USER_PASS}
+      MYSQL_PASSWORD: ${USER_PASSWORD}
       TZ: 'Asia/Tokyo'
 
     ports:

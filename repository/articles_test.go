@@ -3,7 +3,7 @@ package repository
 import (
 	"github.com/jmoiron/sqlx"
 	"practice_go/database"
-	"practice_go/models"
+	"practice_go/entity"
 	"reflect"
 	"testing"
 )
@@ -65,7 +65,7 @@ func TestGetArticleByArticleID(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    *models.Article
+		want    *entity.Article
 		wantErr bool
 	}{
 		{"1", args{db: database.DB, articleID: 2}, &database.ArticleTestData[1], false},
@@ -92,11 +92,11 @@ func TestGetArticleByArticleID(t *testing.T) {
 func TestInsertArticle(t *testing.T) {
 
 	actualArticle := database.ArticleTestData[2]
-	var expectedArticle models.Article
+	var expectedArticle entity.Article
 
 	type args struct {
 		db      *sqlx.DB
-		article *models.Article
+		article *entity.Article
 	}
 	tests := []struct {
 		name    string
@@ -135,7 +135,7 @@ func TestInsertArticle(t *testing.T) {
 
 func TestListArticles(t *testing.T) {
 
-	articles := []*models.Article{&database.ArticleTestData[0], &database.ArticleTestData[1]}
+	articles := []*entity.Article{&database.ArticleTestData[0], &database.ArticleTestData[1]}
 
 	type args struct {
 		db *sqlx.DB
@@ -143,7 +143,7 @@ func TestListArticles(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    []*models.Article
+		want    []*entity.Article
 		wantErr bool
 	}{
 		{"1", args{database.DB}, articles, false},
