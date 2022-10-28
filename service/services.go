@@ -3,7 +3,6 @@ package service
 import (
 	"github.com/jmoiron/sqlx"
 	"log"
-	"practice_go/database"
 	"practice_go/entity"
 	"practice_go/repository"
 )
@@ -17,7 +16,7 @@ func NewMyAppService(db *sqlx.DB) *MyAppService {
 }
 
 func (s *MyAppService) GetArticle(articleID int) (*entity.Article, error) {
-	article, err := repository.GetArticleByArticleID(database.DB, articleID)
+	article, err := repository.GetArticleByArticleID(s.db, articleID)
 	if err != nil {
 		log.Println(err.Error())
 		return nil, err
@@ -26,7 +25,7 @@ func (s *MyAppService) GetArticle(articleID int) (*entity.Article, error) {
 }
 
 func (s *MyAppService) ListArticles() ([]*entity.Article, error) {
-	articles, err := repository.ListArticles(database.DB)
+	articles, err := repository.ListArticles(s.db)
 	if err != nil {
 		log.Println(err.Error())
 		return nil, err
@@ -35,7 +34,7 @@ func (s *MyAppService) ListArticles() ([]*entity.Article, error) {
 }
 
 func (s *MyAppService) InsertArticle(article *entity.Article) error {
-	err := repository.InsertArticle(database.DB, article)
+	err := repository.InsertArticle(s.db, article)
 	if err != nil {
 		log.Println(err.Error())
 		return err
@@ -44,7 +43,7 @@ func (s *MyAppService) InsertArticle(article *entity.Article) error {
 }
 
 func (s *MyAppService) PostNice(articleID int) error {
-	err := repository.AddNiceByArticle(database.DB, articleID)
+	err := repository.AddNiceByArticle(s.db, articleID)
 	if err != nil {
 		log.Println(err.Error())
 		return err
@@ -52,8 +51,8 @@ func (s *MyAppService) PostNice(articleID int) error {
 	return nil
 }
 
-func (s *MyAppService) PostComment(comment *entity.Comment) error {
-	err := repository.InsertComment(database.DB, comment)
+func (s *MyAppService) InsertComment(comment *entity.Comment) error {
+	err := repository.InsertComment(s.db, comment)
 	if err != nil {
 		log.Println(err.Error())
 		return err

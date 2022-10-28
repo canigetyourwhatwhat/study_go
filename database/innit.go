@@ -8,13 +8,8 @@ import (
 	"os"
 )
 
-var DB *sqlx.DB
+func ConnectDB() (*sqlx.DB, error) {
 
-func ConnectDB() error {
-
-	if DB != nil {
-		return nil
-	}
 	dbUser := os.Getenv("USER_NAME")
 	dbPass := os.Getenv("USER_PASSWORD")
 	dbName := os.Getenv("DB_NAME")
@@ -32,16 +27,15 @@ func ConnectDB() error {
 
 	if err != nil {
 		fmt.Println("Couldn't connect the Database")
-		return err
+		return nil, err
 	}
 
 	if err = db.Ping(); err != nil {
 		fmt.Println("Ping to DB is failed")
-		return err
+		return nil, err
 	} else {
 		log.Println("DB is healthy")
 	}
 
-	DB = db
-	return nil
+	return db, nil
 }

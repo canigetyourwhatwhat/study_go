@@ -1,33 +1,24 @@
-package controllers
+package api
 
 import (
 	"encoding/json"
 	"github.com/gorilla/mux"
-	"io"
 	"log"
 	"net/http"
 	"practice_go/entity"
-	"practice_go/service"
+	"practice_go/interfaces"
 	"strconv"
 )
 
-type MyAppController struct {
-	service *service.MyAppService
+type ArticleController struct {
+	service interfaces.ArticleService
 }
 
-func NewMyAppController(s *service.MyAppService) *MyAppController {
-	return &MyAppController{service: s}
+func NewMyAppController(s interfaces.ArticleService) *ArticleController {
+	return &ArticleController{service: s}
 }
 
-func HelloHandler(w http.ResponseWriter, _ *http.Request) {
-	log.Println("hello handler")
-	if _, err := io.WriteString(w, "hello"); err != nil {
-		http.Error(w, "Can't write", http.StatusInternalServerError)
-		return
-	}
-}
-
-func (c *MyAppController) GetArticle(w http.ResponseWriter, r *http.Request) {
+func (c *ArticleController) GetArticle(w http.ResponseWriter, r *http.Request) {
 
 	// Get the ID of the article
 	articleID, err := strconv.Atoi(mux.Vars(r)["id"])
@@ -51,7 +42,7 @@ func (c *MyAppController) GetArticle(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func (c *MyAppController) ListArticles(w http.ResponseWriter, _ *http.Request) {
+func (c *ArticleController) ListArticles(w http.ResponseWriter, _ *http.Request) {
 
 	// Call business logic without parameter
 	articles, err := c.service.ListArticles()
@@ -69,7 +60,7 @@ func (c *MyAppController) ListArticles(w http.ResponseWriter, _ *http.Request) {
 
 }
 
-func (c *MyAppController) PostArticle(w http.ResponseWriter, r *http.Request) {
+func (c *ArticleController) PostArticle(w http.ResponseWriter, r *http.Request) {
 	var article entity.Article
 
 	err := json.NewDecoder(r.Body).Decode(&article)
@@ -83,7 +74,7 @@ func (c *MyAppController) PostArticle(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (c *MyAppController) PostNice(w http.ResponseWriter, r *http.Request) {
+func (c *ArticleController) PostNice(w http.ResponseWriter, r *http.Request) {
 
 	// Get the article ID by decoding
 	type Req struct {
@@ -98,19 +89,5 @@ func (c *MyAppController) PostNice(w http.ResponseWriter, r *http.Request) {
 	err = c.service.PostNice(req.ArticleId)
 	if err != nil {
 		http.Error(w, "Failed to add nice on the article", http.StatusInternalServerError)
-	}
-}
-
-func (c *MyAppController) PostComment(w http.ResponseWriter, r *http.Request) {
-	var comment entity.Comment
-
-	err := json.NewDecoder(r.Body).Decode(&comment)
-	if err != nil {
-		http.Error(w, "Failed to decode", http.StatusBadRequest)
-	}
-
-	err = c.service.PostComment(&comment)
-	if err != nil {
-		http.Error(w, "Failed to post comment", http.StatusInternalServerError)
 	}
 }

@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"fmt"
+	"github.com/jmoiron/sqlx"
 	"log"
 	"os"
 	"os/exec"
@@ -9,8 +9,12 @@ import (
 	"testing"
 )
 
+var db *sqlx.DB
+
 func setUp() error {
-	err := database.ConnectDB()
+	var err error
+	db, err = database.ConnectDB()
+
 	if err != nil {
 		log.Println(err.Error())
 		return err
@@ -35,6 +39,7 @@ func setUpTestData() error {
 	cmd := exec.Command("mysql", "-h", "127.0.0.1", "-u", "docker", "sampledb", "--password=docker", "-e", "source ../database/init.sql")
 	err := cmd.Run()
 	if err != nil {
+		log.Println(err.Error())
 		return err
 	}
 	return nil
@@ -44,6 +49,7 @@ func cleanUp() error {
 	cmd := exec.Command("mysql", "-h", "127.0.0.1", "-u", "docker", "sampledb", "--password=docker", "-e", "source ../database/cleanupTestDB.sql")
 	err := cmd.Run()
 	if err != nil {
+		log.Println(err.Error())
 		return err
 	}
 	return nil
@@ -52,15 +58,15 @@ func cleanUp() error {
 func tearDown() {
 	err := cleanUp()
 	if err != nil {
-		fmt.Println(err.Error())
+		log.Println(err.Error())
 	}
-	_ = database.DB.Close()
+	_ = db.Close()
 }
 
 func TestMain(m *testing.M) {
-	var err error
 
-	if err = setUp(); err != nil {
+	err := setUp()
+	if err != nil {
 		log.Println("couldn't setup test DB")
 		os.Exit(1)
 	}

@@ -2,31 +2,34 @@ package router
 
 import (
 	"github.com/gorilla/mux"
+	"github.com/jmoiron/sqlx"
 	"net/http"
-	"practice_go/controllers"
+	"practice_go/api"
+	"practice_go/service"
 )
 
-func NewRouter(con *controllers.MyAppController) *mux.Router {
+func NewRouter(db *sqlx.DB) *mux.Router {
 
 	r := mux.NewRouter()
 
-	// simply return hello
-	r.HandleFunc("/hello", controllers.HelloHandler).Methods(http.MethodGet)
+	ser := service.NewMyAppService(db)
+	articleCon := api.NewMyAppController(ser)
+	commentCon := api.NewCommentController(ser)
 
 	// Post an article
-	r.HandleFunc("/article", con.PostArticle).Methods(http.MethodPost)
+	r.HandleFunc("/article", articleCon.PostArticle).Methods(http.MethodPost)
 
 	// Get specific article based on the article_id
-	r.HandleFunc("/article/{id:[0-9]+}", con.GetArticle).Methods(http.MethodGet)
+	r.HandleFunc("/article/{id:[0-9]+}", articleCon.GetArticle).Methods(http.MethodGet)
 
 	// List all articles
-	r.HandleFunc("/article/all", con.ListArticles).Methods(http.MethodGet)
+	r.HandleFunc("/article/all", articleCon.ListArticles).Methods(http.MethodGet)
 
 	// Add nice to the specific article
-	r.HandleFunc("/article/nice", con.PostNice).Methods(http.MethodPost)
+	r.HandleFunc("/article/nice", articleCon.PostNice).Methods(http.MethodPost)
 
 	// Add comment to the specific article
-	r.HandleFunc("/article/comment", con.PostComment).Methods(http.MethodPost)
+	r.HandleFunc("/article/comment", commentCon.PostComment).Methods(http.MethodPost)
 
 	return r
 }

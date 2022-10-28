@@ -24,9 +24,9 @@ func TestAddNiceByArticle(t *testing.T) {
 		args    args
 		wantErr bool
 	}{
-		{"1", args{db: database.DB, articleId: targetArticleId}, false},
-		{"2", args{db: database.DB, articleId: targetArticleId}, false},
-		{"3", args{db: database.DB, articleId: targetArticleId}, false},
+		{"1", args{db: db, articleId: targetArticleId}, false},
+		{"2", args{db: db, articleId: targetArticleId}, false},
+		{"3", args{db: db, articleId: targetArticleId}, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -34,7 +34,7 @@ func TestAddNiceByArticle(t *testing.T) {
 				t.Errorf("AddNiceByArticle() error = %v, wantErr %v", err, tt.wantErr)
 			}
 
-			if err := database.DB.Get(&actualNiceNum, "select nice_num from articles where id = ?", targetArticleId); err != nil {
+			if err := db.Get(&actualNiceNum, "select nice_num from articles where id = ?", targetArticleId); err != nil {
 				t.Errorf(err.Error())
 			}
 
@@ -49,7 +49,7 @@ func TestAddNiceByArticle(t *testing.T) {
 	}
 
 	t.Cleanup(func() {
-		if _, err := database.DB.Exec("update articles set nice_num = ? where id = ?", initialNiceNum, targetArticleId); err != nil {
+		if _, err := db.Exec("update articles set nice_num = ? where id = ?", initialNiceNum, targetArticleId); err != nil {
 			t.Errorf(err.Error())
 		}
 	})
@@ -68,7 +68,7 @@ func TestGetArticleByArticleID(t *testing.T) {
 		want    *entity.Article
 		wantErr bool
 	}{
-		{"1", args{db: database.DB, articleID: 2}, &database.ArticleTestData[1], false},
+		{"1", args{db: db, articleID: 2}, &database.ArticleTestData[1], false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -103,7 +103,7 @@ func TestInsertArticle(t *testing.T) {
 		args    args
 		wantErr bool
 	}{
-		{"1", args{db: database.DB, article: &actualArticle}, false},
+		{"1", args{db: db, article: &actualArticle}, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -111,7 +111,7 @@ func TestInsertArticle(t *testing.T) {
 				t.Errorf("InsertArticle() error = %v, wantErr %v", err, tt.wantErr)
 			}
 
-			if err := database.DB.Get(&expectedArticle, "select * from articles where id = ?", actualArticle.ID); err != nil {
+			if err := db.Get(&expectedArticle, "select * from articles where id = ?", actualArticle.ID); err != nil {
 				t.Errorf(err.Error())
 			}
 
@@ -127,7 +127,7 @@ func TestInsertArticle(t *testing.T) {
 	}
 
 	t.Cleanup(func() {
-		if _, err := database.DB.Exec("delete from articles where id = ?", actualArticle.ID); err != nil {
+		if _, err := db.Exec("delete from articles where id = ?", actualArticle.ID); err != nil {
 			t.Errorf(err.Error())
 		}
 	})
@@ -146,7 +146,7 @@ func TestListArticles(t *testing.T) {
 		want    []*entity.Article
 		wantErr bool
 	}{
-		{"1", args{database.DB}, articles, false},
+		{"1", args{db}, articles, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
