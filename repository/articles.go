@@ -3,7 +3,7 @@ package repository
 import (
 	"database/sql"
 	"errors"
-	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/go-sql-driver/mysql" // It is the key to connect DB, but don't use it explicitly.
 	"github.com/jmoiron/sqlx"
 	"practice_go/entity"
 )
