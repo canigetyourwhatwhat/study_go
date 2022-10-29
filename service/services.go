@@ -4,6 +4,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"log"
 	"practice_go/entity"
+	"practice_go/errors"
 	"practice_go/repository"
 )
 
@@ -18,8 +19,8 @@ func NewMyAppService(db *sqlx.DB) *MyAppService {
 func (s *MyAppService) GetArticle(articleID int) (*entity.Article, error) {
 	article, err := repository.GetArticleByArticleID(s.db, articleID)
 	if err != nil {
-		log.Println(err.Error())
-		return nil, err
+		errCode := errors.InsertDataFailed.Wrap(err, "fail to get data")
+		return nil, errCode
 	}
 	return article, nil
 }
