@@ -9,7 +9,6 @@ var tempTime, _ = time.Parse("2000-01-01 00:00:00", "2000-01-01 00:00:00")
 
 var ArticleTestData = []entity.Article{
 	{
-		ID:        1,
 		Title:     "firstPost",
 		Contents:  "This is my first blog",
 		UserName:  "john",
@@ -18,7 +17,6 @@ var ArticleTestData = []entity.Article{
 		UpdatedAt: tempTime,
 	},
 	{
-		ID:        2,
 		Title:     "2nd",
 		Contents:  "Second blog post",
 		UserName:  "bob",
@@ -27,7 +25,6 @@ var ArticleTestData = []entity.Article{
 		UpdatedAt: tempTime,
 	},
 	{
-		ID:        3,
 		Title:     "For Insertion",
 		Contents:  "Third blog post",
 		UserName:  "david",
