@@ -7,7 +7,7 @@ import (
 	"log"
 	"net/http"
 	"practice_go/database"
-	"practice_go/models"
+	"practice_go/entity"
 	"practice_go/repository"
 	"strconv"
 )
@@ -27,7 +27,7 @@ func GetArticle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var article *models.Article
+	var article *entity.Article
 	article, err = repository.GetArticleByArticleID(database.DB, articleID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -42,7 +42,7 @@ func GetArticle(w http.ResponseWriter, r *http.Request) {
 }
 
 func ListArticles(w http.ResponseWriter, r *http.Request) {
-	var articles []*models.Article
+	var articles []*entity.Article
 	var err error
 
 	articles, err = repository.ListArticles(database.DB)
@@ -60,7 +60,7 @@ func ListArticles(w http.ResponseWriter, r *http.Request) {
 }
 
 func PostArticle(w http.ResponseWriter, r *http.Request) {
-	var article models.Article
+	var article entity.Article
 
 	err := json.NewDecoder(r.Body).Decode(&article)
 	if err != nil {
@@ -93,7 +93,7 @@ func PostNice(w http.ResponseWriter, r *http.Request) {
 }
 
 func PostComment(w http.ResponseWriter, r *http.Request) {
-	var comment models.Comment
+	var comment entity.Comment
 
 	err := json.NewDecoder(r.Body).Decode(&comment)
 	if err != nil {
