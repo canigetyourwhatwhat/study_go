@@ -5,6 +5,7 @@ import (
 	"errors"
 	_ "github.com/go-sql-driver/mysql" // It is the key to connect DB, but don't use it explicitly.
 	"github.com/jmoiron/sqlx"
+	"practice_go/customErrors"
 	"practice_go/entity"
 )
 
@@ -14,8 +15,13 @@ func InsertArticle(db *sqlx.DB, article *entity.Article) error {
 		return err
 	}
 
-	_, err = tx.Exec("insert into articles (title, contents, username, nice_num) values (?, ?, ?, ?)", article.Title, article.Contents, article.UserName, article.NiceNum)
+	_, err = tx.Exec("insert into articles (title, contents, username, nice_num) values (?, ?, ?, ?)",
+		article.Title,
+		article.Contents,
+		article.UserName,
+		article.NiceNum)
 	if err != nil {
+		err = customErrors.InsertDataFailed.Wrap(err, "failed to insert data")
 		if err = tx.Rollback(); err != nil {
 			return err
 		}
@@ -23,13 +29,14 @@ func InsertArticle(db *sqlx.DB, article *entity.Article) error {
 	}
 
 	if err = tx.Commit(); err != nil {
+		err = customErrors.InsertDataFailed.Wrap(err, "failed to insert data")
 		if err = tx.Rollback(); err != nil {
 			return err
 		}
 		return err
 	}
 
-	return err
+	return nil
 }
 
 func GetArticleByArticleID(db *sqlx.DB, articleID int) (*entity.Article, error) {
@@ -46,9 +53,11 @@ func GetArticleByArticleID(db *sqlx.DB, articleID int) (*entity.Article, error) 
     		c.created_at as comment_create_at
 		from articles as a inner join comments c on a.id = c.article_id where a.id = ?`, &articleID)
 	if errors.Is(err, sql.ErrNoRows) {
-		return nil, errors.New("no article for that ID")
+		err = customErrors.DataNotFound.Wrap(err, "No data")
+		return nil, err
 	}
 	if err != nil {
+		err = customErrors.GetDataFailed.Wrap(err, "failed to get data")
 		return nil, err
 	}
 
@@ -89,9 +98,16 @@ func ListArticles(db *sqlx.DB) ([]*entity.Article, error) {
     		c.created_at as comment_create_at
 		from articles as a inner join comments c on a.id = c.article_id order by a.id`)
 	if errors.Is(err, sql.ErrNoRows) {
-		return nil, errors.New("no article for that ID")
+		err = customErrors.DataNotFound.Wrap(err, "No data")
+		return nil, err
 	}
 	if err != nil {
+		err = customErrors.GetDataFailed.Wrap(err, "failed to get data")
+		return nil, err
+	}
+
+	if len(articlesData) == 0 {
+		err = customErrors.DataNotFound.Wrap(customErrors.ErrNoData, "No data was found")
 		return nil, err
 	}
 
