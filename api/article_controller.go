@@ -15,7 +15,7 @@ type ArticleController struct {
 	service interfaces.ArticleService
 }
 
-func NewMyAppController(s interfaces.ArticleService) *ArticleController {
+func NewArticleController(s interfaces.ArticleService) *ArticleController {
 	return &ArticleController{service: s}
 }
 

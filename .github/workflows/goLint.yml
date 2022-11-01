@@ -1,0 +1,16 @@
+
+# It is a liter for Go
+
+name: Go lint
+on:
+  push:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Linter
+        uses: golangci/golangci-lint-action@v2
+        with:
+          version: latest

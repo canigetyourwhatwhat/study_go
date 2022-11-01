@@ -10,6 +10,8 @@ const (
 	DataNotFound     ErrCode = "D0003"
 
 	ReqBodyDecodeFailed ErrCode = "R0001"
+
+	FailedConnectingDB ErrCode = "A0001"
 )
 
 var ErrNoData = errors.New("got no data from the database")

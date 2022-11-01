@@ -13,7 +13,7 @@ func NewRouter(db *sqlx.DB) *mux.Router {
 	r := mux.NewRouter()
 
 	ser := service.NewMyAppService(db)
-	articleCon := api.NewMyAppController(ser)
+	articleCon := api.NewArticleController(ser)
 	commentCon := api.NewCommentController(ser)
 
 	// Post an article
