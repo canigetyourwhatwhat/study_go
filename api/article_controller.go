@@ -5,6 +5,7 @@ import (
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
+	"practice_go/customErrors"
 	"practice_go/entity"
 	"practice_go/interfaces"
 	"strconv"
@@ -83,6 +84,7 @@ func (c *ArticleController) PostNice(w http.ResponseWriter, r *http.Request) {
 	var req Req
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
+		err = customErrors.ReqBodyDecodeFailed.Wrap(err, "bad request body")
 		http.Error(w, "Failed to decode", http.StatusBadRequest)
 	}
 

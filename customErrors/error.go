@@ -1,4 +1,4 @@
-package errors
+package customErrors
 
 type MyAppError struct {
 	Message string
