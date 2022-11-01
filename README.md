@@ -20,6 +20,9 @@ This is dedicated to study some fundamentals about Golang. It focuses on below t
    2. For better DI, also implemented interface.
    3. Separated to router, main, api (controller), service, and repository layers.
 6. Error handling
+   1. Implemented custom error struct that can wrap errors with custom messages
+   2. Used `errors.Is`, `errors.As`, and `errors.New`
+   3. Learned error chain and how to effectively show the root cause of the error
 7. Unit test (advanced)
 8. Logging with middleware
 9. Concurrency
